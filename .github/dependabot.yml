@@ -1,0 +1,6 @@
+# version: 2
+# updates:
+#   - package-ecosystem: "npm"    # or yarn, etc.
+#     directory: "bank_app/site"            # location of your package.json
+#     schedule:
+#       interval: "weekly"      # can be "daily", "weekly", or "monthly"
