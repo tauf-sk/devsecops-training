@@ -1,0 +1,23 @@
+name: Pull request check
+on:
+  pull_request:
+    branches:
+        - main
+
+env:
+  #Registry/Repository As Required
+  DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+  DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_adn_push:
+    runs-on: ubuntu-latest
+
+  steps:
+  # Step 1: Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v3
