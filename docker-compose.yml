@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  bank_app:
+    build: ./bank_app
+    links:
+      - bank_db
+    restart: unless-stopped
+    ports:
+        - "9001:9001"
+
+  bank_db:
+    build: ./bank_db
+    restart: unless-stopped

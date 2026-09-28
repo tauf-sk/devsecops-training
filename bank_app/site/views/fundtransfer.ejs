@@ -1,0 +1,56 @@
+<html>
+
+<head>
+    <title>NotSoSecure Banking</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <script type="text/javascript" src="./js/bootstrap.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="margin-left: 20px;" class="navbar-brand" href="#">NotSoSecureBank</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="leftNavItems">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/dashboard">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/addpayee">AddPayee</a></li>
+                <li class="nav-item"><a class="nav-link" href="/fundtransfer">TransferFund</a></li>
+                <li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
+            </ul>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="margin-right: 20px;" id="rightNavItems">
+                <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="row" style="margin-top: 150px; justify-content: center">
+        <div class="col-sm-3">
+            <div class="card text-center">
+                <div class="card-header">Fund Transfer</div>
+                <div class="card-body">
+                    <form action="/fundtransfer" method="POST">
+                        
+                        <select class="form-select" name="accountnumber" id="accountnumber">
+                            <option value="">Select Account Number</option>
+                            <% for(var count=0; count <accnos.length; count++) { %>
+                                <option value="<%=accnos[count].account_number %>">
+                                    <%=accnos[count].firstname %> <%=accnos[count].lastname %>    (Account No: <%=accnos[count].account_number %>)
+                                </option>
+                            <% } %>
+                        </select><br />
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="amount" placeholder="Amount" name="amount">
+                        </div><br />
+
+                        <button type="submit" class="btn btn-primary btn-block mb-4">
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <script type="text/javascript" src="./js/bootstrap.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a style="margin-left: 20px;" class="navbar-brand" href="/index">NotSoSecureBank</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="margin-right: 20px;" id="rightNavItems">
+                <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="row" style="margin-top: 150px; justify-content: center">
+        <div class="col-sm-3">
+            <div class="card text-center">
+                <div class="card-header">Login</div>
+                <div class="card-body">
+                    <form action="/login" method="POST">
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="email" name="email"
+                                aria-describedby="emailHelp" placeholder="email">
+                        </div>
+                        <br />
+
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="password">
+                        </div>
+                        <br />
+
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <br /><br />
+
+                        <div class="text-center">
+                            <p>Don't have an account yet? <a href="/register">Register</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

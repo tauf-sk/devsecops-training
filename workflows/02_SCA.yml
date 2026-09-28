@@ -1,0 +1,86 @@
+name: Build and Push Docker Images to ECR
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # Registry/Repository As Required
+  DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+  DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # ###########################################
+      # # SCA/ Dependency Checking with NPM Audit
+      # ###########################################
+
+      # Basic Node Setup
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # NPM Setup
+      - name: Install dependencies
+        working-directory: bank_app/site
+        run: npm install
+
+      # NPM Audit and saving file as JSON Report
+      - name: Run npm audit and output JSON
+        working-directory: bank_app/site
+        run: npm audit --json > audit.json || true
+
+      # Report Upload as Github Artifact -- Available in Workflow Summary to Download
+      - name: Upload audit report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: bank_app/site/audit.json
+
+      # Upload report to DefectDojo - test
+      - name: Upload NPM Audit to DefectDojo
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BASE="${DEFECTDOJO_URL%/}"
+          API="$BASE/api/v2"
+
+          SCAN_TYPE="NPM Audit v7+ Scan"
+          PRODUCT_NAME="ProductUser1"
+          ENGAGEMENT_NAME="Continuous Testing"
+          TEST_TITLE="NPM Audit (CI)"
+          FILE_PATH="bank_app/site/audit.json"
+
+          test -f "$FILE_PATH" || { echo "❌ File not found: $FILE_PATH"; ls -R; exit 1; }
+
+          HTTP=$(curl -skS -o /tmp/dojo.json -w "%{http_code}" \
+            -X POST "$API/reimport-scan/" \
+            -H "Authorization: Token $DEFECTDOJO_API_KEY" \
+            -H "Accept: application/json" \
+            -F "scan_type=$SCAN_TYPE" \
+            -F "product_name=$PRODUCT_NAME" \
+            -F "engagement_name=$ENGAGEMENT_NAME" \
+            -F "test_title=$TEST_TITLE" \
+            -F "auto_create_context=true" \
+            -F "scan_date=$(date -u +%F)" \
+            -F "close_old_findings=true" \
+            -F "file=@${FILE_PATH}"
+          )
+
+          echo "HTTP: $HTTP"
+          cat /tmp/dojo.json
+          [[ "$HTTP" == 2* ]]

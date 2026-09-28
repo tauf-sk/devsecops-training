@@ -1,0 +1,7 @@
+name: Inspec Docker Best Practices
+title: Docker Node.js Best Practices Profile
+maintainer:  Yash Roongta - acc3ssp0int
+copyright: NotSoSecure Trainings Copyright (C) 20205
+license: Apache-2.0
+summary: This profile tests that a Node.js web application container adheres to best practices for containerization.
+version: 1.0.0(Beta)

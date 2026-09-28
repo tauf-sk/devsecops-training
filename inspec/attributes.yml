@@ -1,0 +1,4 @@
+# attributes.yml
+# Define attributes for the profile. You can override these when running the profile.
+expected_digest_pattern: '@sha256:'
+
