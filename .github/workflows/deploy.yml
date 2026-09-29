@@ -58,7 +58,7 @@ jobs:
             -F "scan_type=ZAP Scan" \
             -F "product_name=ecommerceApp06" \
             -F "engagement_name=Continuous Testing" \
-            -F "test_title=ZAP Baseline - App" \
+            -F "test_title=ZAP Baseline - App1" \
             -F "auto_create_context=true" \
             -F "scan_date=$(date -u +%F)" \
             -F "close_old_findings=true" \
