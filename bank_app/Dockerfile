@@ -1,4 +1,4 @@
-FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
+FROM node:22-alpine@sha256-2c752226d477b4a886378baa95b9af252be59301b725fdb0b7e15208131505a8
 WORKDIR /app
 COPY ./site /app/
 * RUN rm -rf /app/node_modules
