@@ -11,5 +11,5 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY site/ ./
-USER node
+USER no-root
 CMD ["npm","start"]
