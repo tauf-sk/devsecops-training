@@ -1,0 +1,26 @@
+# Dependencies (installed fresh inside the image)
+**/node_modules
+**/npm-debug.log
+
+# Secrets and credentials
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/.npmrc
+
+# Version control and tooling
+**/.git
+**/.gitignore
+**/.vscode
+**/.idea
+
+# Build and test artifacts
+**/coverage
+**/test
+**/tests
+
+# Docker files themselves
+Dockerfile*
+docker-compose*
+.dockerignore
