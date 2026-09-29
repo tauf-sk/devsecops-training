@@ -23,49 +23,112 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+      # - name: gitleaks
+      #   uses: gitleaks/gitleaks-action@v2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
-      - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.15.0
-        with:
-          allow_issue_writing: false
-          target: "https://secureapp.appsecops.dev/"
-          cmd_options: "-x zap_app.xml"
+      # - name: ZAP Scan
+      #   uses: zaproxy/action-baseline@v0.15.0
+      #   with:
+      #     allow_issue_writing: false
+      #     target: "https://secureapp.appsecops.dev/"
+      #     cmd_options: "-x zap_app.xml"
 
-      - name: Show files
-        shell: bash
-        run: |
-          ls -l
-          cat zap_app.xml
+      # - name: Show files
+      #   shell: bash
+      #   run: |
+      #     ls -l
+      #     cat zap_app.xml
 
          
-      - name: Upload ZAP XML to DefectDojo
+      # - name: Upload ZAP XML to DefectDojo
+      #   shell: bash
+      #   run: |
+      #     set -euo pipefail 
+      #     test -s zap_app.xml || { echo "❌ Missing/empty ZAP XML"; ls -lah; exit 1; }
+
+      #     BASE="${DEFECTDOJO_URL%/}"
+      #     API="$BASE/api/v2"
+
+      #     HTTP=$(curl -skS -o /tmp/dojo_zap.json -w "%{http_code}" \
+      #       -X POST "$API/reimport-scan/" \
+      #       -H "Authorization: Token $DEFECTDOJO_API_KEY" \
+      #       -H "Accept: application/json" \
+      #       -F "scan_type=ZAP Scan" \
+      #       -F "product_name=ecommerceApp06" \
+      #       -F "engagement_name=Continuous Testing" \
+      #       -F "test_title=ZAP Baseline - App1" \
+      #       -F "auto_create_context=true" \
+      #       -F "scan_date=$(date -u +%F)" \
+      #       -F "close_old_findings=true" \
+      #       -F "file=@zap_app.xml"
+      #     )
+
+      #     echo "HTTP: $HTTP"
+      #     cat /tmp/dojo_zap.json
+      #     [[ "$HTTP" == 2* ]]
+
+      - name: Build bank_app image
+        working-directory: bank_app/
         shell: bash
         run: |
-          set -euo pipefail 
-          test -s zap_app.xml || { echo "❌ Missing/empty ZAP XML"; ls -lah; exit 1; }
+          set -euo pipefail
+          docker build -t testapp:app-latest .
+      
+      - name: Verify bank_app image exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker image inspect testapp:app-latest >/dev/null
+          docker images | head -n 20
+      
+      - name: Trivy scan bank_app image (local)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "testapp:app-latest"
+          format: "json"
+          output: "trivy-app.json"
+          # exit-code: "1"
+          # severity: "CRITICAL,HIGH"
+      
+      - name: Upload trivy-app.json artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-app-report
+          path: trivy-app.json
 
+
+
+      - name: Upload Trivy App scan to DefectDojo
+        shell: bash
+        run: |
+          set -euo pipefail
           BASE="${DEFECTDOJO_URL%/}"
           API="$BASE/api/v2"
 
-          HTTP=$(curl -skS -o /tmp/dojo_zap.json -w "%{http_code}" \
+          SCAN_TYPE="Trivy Scan"
+          PRODUCT_NAME="ecommerceApp06"
+          ENGAGEMENT_NAME="Continuous Testing"
+          TEST_TITLE="Trivy Scan - App"
+          FILE_PATH="trivy-app.json"
+
+          test -s "$FILE_PATH" || { echo "❌ Missing/empty: $FILE_PATH"; ls -lah; exit 1; }
+
+          HTTP=$(curl -skS -o /tmp/dojo_app.json -w "%{http_code}" \
             -X POST "$API/reimport-scan/" \
             -H "Authorization: Token $DEFECTDOJO_API_KEY" \
             -H "Accept: application/json" \
-            -F "scan_type=ZAP Scan" \
-            -F "product_name=ecommerceApp06" \
-            -F "engagement_name=Continuous Testing" \
-            -F "test_title=ZAP Baseline - App1" \
+            -F "scan_type=$SCAN_TYPE" \
+            -F "product_name=$PRODUCT_NAME" \
+            -F "engagement_name=$ENGAGEMENT_NAME" \
+            -F "test_title=$TEST_TITLE" \
             -F "auto_create_context=true" \
             -F "scan_date=$(date -u +%F)" \
             -F "close_old_findings=true" \
-            -F "file=@zap_app.xml"
+            -F "file=@${FILE_PATH}"
           )
 
-          echo "HTTP: $HTTP"
-          cat /tmp/dojo_zap.json
+          echo "DefectDojo HTTP: $HTTP"
+          cat /tmp/dojo_app.json
           [[ "$HTTP" == 2* ]]
-
